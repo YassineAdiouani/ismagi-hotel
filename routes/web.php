@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ClientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,5 +18,7 @@ use App\Http\Controllers\AdminController;
 Route::get('/', function () {
     return view('index');
 });
+
+Route::resource('clients', ClientController::class);
 
 Route::get('/{page}', [AdminController::class, 'index']);

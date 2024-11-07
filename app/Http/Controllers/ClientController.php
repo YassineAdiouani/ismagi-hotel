@@ -13,7 +13,15 @@ class ClientController extends Controller
     public function index()
     {
         $clients = Client::all();
-        return view('clients.index',compact('clients'));
+
+        // Check if the request is an AJAX request
+        if (request()->ajax()) {
+            // Return clients data as JSON for AJAX requests
+            return response()->json($clients);
+        }
+    
+        // For non-AJAX requests, return the full view
+        return view('clients.index', compact('clients'));
     }
 
     /**
@@ -29,7 +37,17 @@ class ClientController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'cin' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255|unique:clients,email',
+            'phone' => 'required|string|max:20',
+        ]);
+
+        $client = Client::create($validatedData);
+
+        return response()->json($client);
     }
 
     /**
@@ -45,7 +63,7 @@ class ClientController extends Controller
      */
     public function edit(Client $client)
     {
-        //
+        return response()->json($client);
     }
 
     /**
@@ -53,7 +71,8 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
-        //
+        $client->update($request->all());
+        return response()->json(['message' => 'Client updated successfully']);
     }
 
     /**
@@ -61,6 +80,7 @@ class ClientController extends Controller
      */
     public function destroy(Client $client)
     {
-        //
+        $client->delete();
+        return response()->json(['message' => 'Client deleted successfully']);
     }
 }

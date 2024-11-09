@@ -28,14 +28,14 @@
 
 <!--Internal  TelephoneInput css-->
 <link rel="stylesheet" href="{{URL::asset('assets/plugins/telephoneinput/telephoneinput-rtl.css')}}">
-@endsection
+@section('css')
 @section('page-header')
     <!-- breadcrumb -->
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h4 class="content-title mb-0 my-auto">Clients</h4>
-                <span class="text-muted mt-1 tx-13 mr-2 mb-0">/ clients list</span>
+                <h4 class="content-title mb-0 my-auto">Clients | </h4>
+                <span class="text-muted mt-1 tx-13 mr-3 mb-0">&nbsp;clients list</span>
             </div>
         </div>
         <div class="d-flex my-xl-auto right-content">
@@ -351,7 +351,7 @@
             data: formData,
             success: function(response) {
                 $('#editClientModal').modal('hide');
-                loadClientsTable(); // Reload the table data
+                window.location.reload();
             },
             error: function(xhr) {
                 if (xhr.status === 422) {
@@ -378,7 +378,7 @@
                 },
                 success: function(response) {
                     $('#deleteClientModal').modal('hide');
-                    loadClientsTable(); // Reload the table to reflect changes
+                    window.location.reload(); // Reload the page to reflect changes
                 },
                 error: function(xhr) {
                     alert("Failed to delete the client. Please try again.");
@@ -386,6 +386,7 @@
             });
         });
     }
+
 
     const loadClientsTable = () => {
         $.ajax({

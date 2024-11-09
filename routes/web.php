@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\RoomController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,5 +21,6 @@ Route::get('/', function () {
 });
 
 Route::resource('clients', ClientController::class);
+Route::resource('rooms', RoomController::class);
 
 Route::get('/{page}', [AdminController::class, 'index']);

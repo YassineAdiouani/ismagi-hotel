@@ -19,9 +19,9 @@ return new class extends Migration
             $table->enum('type', ['single', 'double', 'suite'])->nullable(false);
             $table->enum('status', ['available', 'reserved', 'maintenance', 'occupied'])->nullable(false);
             $table->text('description')->nullable();
+            $table->json('images')->nullable();
             $table->timestamps();
         });
-        
     }
 
     /**

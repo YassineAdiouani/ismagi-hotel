@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="d-flex my-xl-auto right-content">
-            <div class="pr-1 mb-3 mb-xl-0"  data-toggle="tooltip" data-placement="bottom" title="Add New Client">
+            <div class="pr-1 mb-3 mb-xl-0" data-toggle="tooltip" data-placement="bottom" title="Add New Client">
                 <button type="button" class="modal-effect btn btn-primary btn-icon ml-2" data-effect="effect-fall" data-toggle="modal" href="#addClientsModal">
                     <i class="mdi mdi-plus"></i>
                 </button>
@@ -279,13 +279,12 @@
             $('#addClientForm').parsley();
         });
 
-        // AJAX form submission with Parsley validation
         $('#addClientForm').on('submit', function(event) {
-            event.preventDefault(); // Prevent default form submission
+            event.preventDefault();
 
             if ($(this).parsley().isValid()) {
-                // If form is valid, proceed with AJAX
-                $('.error').text(''); // Clear previous error messages
+
+                $('.error').text('');
 
                 const formData = $(this).serialize();
                 const action = $(this).data('action');
@@ -296,14 +295,11 @@
                     method: method,
                     data: formData,
                     success: function(response) {
-                        // Close the modal
                         $('#addClientsModal').modal('hide');
                         
-                        // Add the new client to the table
-                        loadClientsTable();
-
-                        // Reset the form if needed
                         $('#addClientForm')[0].reset();
+                        
+                        window.location.reload();
                     },
                     error: function(xhr) {
                         if (xhr.status === 422) { // Validation error

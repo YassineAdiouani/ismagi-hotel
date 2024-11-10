@@ -1,6 +1,16 @@
 @extends('layouts.master')
+
 @section('css')
-@section('css')
+    <style>
+        .description {
+            max-width: 250px; /* Set max-width based on your layout */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+        }
+    </style>
+@endsection
 
 @section('page-header')
     <!-- breadcrumb -->
@@ -12,8 +22,8 @@
             </div>
         </div>
         <div class="d-flex my-xl-auto right-content">
-            <div class="pr-1 mb-3 mb-xl-0"  data-toggle="tooltip" data-placement="bottom" title="Add New Client">
-                <button type="button" class="modal-effect btn btn-primary btn-icon ml-2" data-effect="effect-fall" data-toggle="modal" href="#addClientsModal">
+            <div class="pr-1 mb-3 mb-xl-0" data-toggle="tooltip" data-placement="bottom" title="Add New Room">
+                <button type="button" class="modal-effect btn btn-primary btn-icon ml-2" data-effect="effect-fall" data-toggle="modal" href="#addRoomModal">
                     <i class="mdi mdi-plus"></i>
                 </button>
             </div>
@@ -23,108 +33,117 @@
                 </button>
             </div>
         </div>
-        <div class="modal" id="addClientsModal">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content modal-content-demo">
-					<div class="modal-header">
-                        <h6 class="modal-title">Add New Client</h6>
+
+        <div class="modal" id="addRoomModal">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content modal-content-demo">
+                    <div class="modal-header">
+                        <h6 class="modal-title">Add New Room</h6>
                         <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!-- Form for Adding a New Client -->
-                        <form id="addClientForm" data-action="{{ route('clients.store') }}" data-method="POST">
+                        <!-- Form for Adding a New Room with Parsley Validation -->
+                        <form id="addRoomForm" data-action="{{ route('rooms.store') }}" data-method="POST" enctype="multipart/form-data" data-parsley-validate>
                             @csrf
-                            <div class="form-group">
-                                <label for="cin">CIN <span class="tx-danger">*</span></label>
-                                <input type="text" id="cin" name="cin" placeholder="cin..." class="form-control" required 
-                                       data-parsley-required-message="CIN is required">
-                                <div class="error text-danger" id="cin-error"></div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="first_name">First Name <span class="tx-danger">*</span></label>
-                                <input type="text" id="first_name" name="first_name" placeholder="first name..." class="form-control" required 
-                                       data-parsley-required-message="First name is required">
-                                <div class="error text-danger" id="first_name-error"></div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="last_name">Last Name <span class="tx-danger">*</span></label>
-                                <input type="text" id="last_name" name="last_name" placeholder="last name..." class="form-control" required 
-                                       data-parsley-required-message="Last name is required">
-                                <div class="error text-danger" id="last_name-error"></div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" id="email" name="email" placeholder="email..." class="form-control"
-                                       data-parsley-type="email" data-parsley-type-message="Enter a valid email address">
-                                <div class="error text-danger" id="email-error"></div>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="phone">Phone <span class="tx-danger">*</span></label>
-                                <div class="input-group phone_select_input">
-                                    <input type="tel" id="phone" name="phone" class="form-control" required 
-                                           data-parsley-required-message="Phone number is required">
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <label for="nbr">Room Number <span class="tx-danger">*</span></label>
+                                    <input type="text" id="nbr" name="nbr" placeholder="Room number..." class="form-control" required
+                                           data-parsley-required-message="Room number is required">
+                                    <div class="error text-danger" id="nbr-error"></div>
                                 </div>
-                                <div class="error text-danger" id="phone-error"></div>
+                        
+                                <div class="form-group col-md-6">
+                                    <label for="floor">Floor <span class="tx-danger">*</span></label>
+                                    <input type="number" id="floor" name="floor" placeholder="Floor..." class="form-control" required
+                                           data-parsley-type="integer" data-parsley-required-message="Floor is required">
+                                    <div class="error text-danger" id="floor-error"></div>
+                                </div>
+                        
+                                <div class="form-group col-md-6">
+                                    <label for="price">Price <span class="tx-danger">*</span></label>
+                                    <input type="number" id="price" name="price" placeholder="Price..." class="form-control" required
+                                           data-parsley-type="number" data-parsley-required-message="Price is required">
+                                    <div class="error text-danger" id="price-error"></div>
+                                </div>
                             </div>
-                            
+                        
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="type">Room Type <span class="tx-danger">*</span></label>
+                                    <select id="type" name="type" class="form-control" required data-parsley-required-message="Room type is required">
+                                        <option value="single">Single</option>
+                                        <option value="double">Double</option>
+                                        <option value="suite">Suite</option>
+                                    </select>
+                                    <div class="error text-danger" id="type-error"></div>
+                                </div>
+                        
+                                <div class="form-group col-md-6">
+                                    <label for="status">Status <span class="tx-danger">*</span></label>
+                                    <select id="status" name="status" class="form-control" required data-parsley-required-message="Status is required">
+                                        <option value="available">Available</option>
+                                        <option value="reserved">Reserved</option>
+                                        <option value="maintenance">Maintenance</option>
+                                        <option value="occupied">Occupied</option>
+                                    </select>
+                                    <div class="error text-danger" id="status-error"></div>
+                                </div>
+                        
+                                <div class="form-group col-md-12">
+                                    <label for="description">Description</label>
+                                    <textarea id="description" name="description" placeholder="Room description..." class="form-control"
+                                              data-parsley-type="string" data-parsley-required-message="Description is required if provided"></textarea>
+                                    <div class="error text-danger" id="description-error"></div>
+                                </div>
+                        
+                                <div class="form-group col-md-12">
+                                    <input class="custom-file-input" id="customFile" type="file" name="images[]" accept="image/jpeg, image/png, image/jpg" multiple>
+                                    <label style="margin: 0px 14px;" class="custom-file-label" for="customFile" id="file-count-label">Choose files</label>
+                                    <div class="error text-danger" id="images-error"></div>
+                                </div>
+                            </div>
+                        
                             <div class="modal-footer">
                                 <button type="submit" class="btn ripple btn-primary">Save changes</button>
                                 <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">Close</button>
                             </div>
-                        </form>                                         
+                        </form>                                                      
                     </div>
-				</div>
-			</div>
-		</div>
+                </div>
+            </div>
+        </div>        
 
-        <div class="modal" id="editClientModal">
+        <div class="modal" id="editRoomModal">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h6 class="modal-title">Edit Client</h6>
+                        <h6 class="modal-title">Edit Room</h6>
                         <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="editClientForm" method="POST">
+                        <form id="editRoomForm" method="POST">
                             @csrf
                             @method('PUT')
         
-                            <!-- Client form fields -->
+                            <!-- Room form fields (replace with room-specific fields) -->
                             <div class="form-group">
-                                <label for="cin">CIN</label>
-                                <input type="text" id="cin" name="cin" class="form-control">
+                                <label for="room_number">Room Number</label>
+                                <input type="text" id="room_number" name="nbr" class="form-control">
                             </div>
         
                             <div class="form-group">
-                                <label for="first_name">First Name</label>
-                                <input type="text" id="first_name" name="first_name" class="form-control">
+                                <label for="floor">Floor</label>
+                                <input type="text" id="floor" name="floor" class="form-control">
                             </div>
         
                             <div class="form-group">
-                                <label for="last_name">Last Name</label>
-                                <input type="text" id="last_name" name="last_name" class="form-control">
-                            </div>
-        
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" id="email" name="email" class="form-control">
-                            </div>
-        
-                             <div class="form-group">
-                                <label for="phone">Phone</label>
-                                <div class="input-group phone_select_input">
-                                    <input type="tel" id="phone" name="phone" class="form-control" required 
-                                           data-parsley-required-message="Phone number is required">
-                                </div>
-                                <div class="error text-danger" id="phone-error"></div>
+                                <label for="price">Price</label>
+                                <input type="number" id="price" name="price" class="form-control">
                             </div>
         
                             <div class="modal-footer">
@@ -137,19 +156,18 @@
             </div>
         </div>
         
-        <div class="modal fade" id="deleteClientModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal fade" id="deleteRoomModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-body text-center">
                         <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                         <i class="mdi mdi-alert-circle-outline tx-100 tx-danger mg-t-20 d-inline-block"></i>
                         <h4 class="tx-danger mg-b-20">Confirm Deletion</h4>
-                        <p class="mg-b-20">Are you sure you want to delete this client?</p>
+                        <p class="mg-b-20">Are you sure you want to delete this room?</p>
                         
-                        <!-- Hidden CSRF token input -->
                         <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
         
-                        <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+                        <button type="button" class="btn btn-danger" id="confirmDeleteRoom">Delete</button>
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
@@ -157,259 +175,317 @@
         </div>
         
     </div>
-    <!-- breadcrumb -->
 @endsection
 
 @section('content')
-<div>
+<div class="d-flex flex-column">
+    <form method="GET" action="{{ route('rooms.index') }}" class="mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Search by room number or description">
+            </div>
+            <div class="col-md-2">
+                <select name="type" class="form-control">
+                    <option value="">All Types</option>
+                    @foreach ($types as $type)
+                        <option value="{{ $type->type }}" {{ request('type') == $type->type ? 'selected' : '' }}>
+                            {{ ucfirst($type->type) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    @foreach ($statuses as $status)
+                        <option value="{{ $status->status }}" {{ request('status') == $status->status ? 'selected' : '' }}>
+                            {{ ucfirst($status->status) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" data-toggle="tooltip" data-placement="bottom" title="Search" class="btn btn-primary btn-with-icon btn-block w-100">
+                    <i class="mdi mdi-magnify"></i> Search
+                </button>
+            </div>
+        </div>
+    </form>
+
     <div class="row row-sm">
-        <div class="col-md-6 col-lg-6 col-xl-4  col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="pro-img-box">
-                        <div class="d-flex product-sale">
-                            <div class="badge bg-pink">New</div>
-                            <i class="mdi mdi-heart-outline ml-auto wishlist"></i>
+        @foreach ($rooms as $room)
+            <div class="col-md-6 col-lg-6 col-xl-3 col-sm-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="pro-img-box">
+                            <div class="d-flex product-sale d-flex justify-content-between">
+                                <div style="position: relative; z-index: 100;" class="badge text-capitalize font-weight-bolder
+                                    @if($room->status == 'available') bg-success
+                                    @elseif($room->status == 'reserved') bg-info
+                                    @elseif($room->status == 'maintenance') badge-dark 
+                                    @elseif($room->status == 'occupied') bg-danger 
+                                    @endif
+                                ">
+                                    {{ $room->status }}
+                                </div>
+                                <div class="dropdown">
+
+                                    <span data-toggle="dropdown" id="dropdownMenuButton" aria-expanded="false" aria-haspopup="true" style="position: relative; z-index: 100; right: 25px;cursor: pointer;" class="badge badge-dark">
+                                        <i class="fe fe-align-right px-1" style="font-size: 13px;" data-toggle="tooltip" data-placement="bottom" title="Actions"></i>
+                                    </span>
+                                    <div  class="dropdown-menu tx-13">
+                                        <a class="dropdown-item" href="#">Details</a>
+                                        <span class="dropdown-item" onclick="openEditModal({{ $room->id }})">Update</span>
+                                        <span style="cursor: pointer;" class="dropdown-item" onclick="deleteRoom({{ $room->id }})">Delete</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="carouselExample2-{{ $room->id }}" class="carousel slide" data-ride="carousel">
+                                <div class="carousel-inner">
+                                    @php
+                                        $images = json_decode($room->images);
+                                    @endphp
+                            
+                                    @if(!empty($images) && count($images) > 0)
+                                        @foreach($images as $index => $image)
+                                            <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                                                <div style="position: relative; height: 200px; overflow: hidden;">
+                                                    {{-- <img 
+                                                        style="object-fit: cover; width: 100%; height: 100%;" 
+                                                        alt="Room image" 
+                                                        class="d-block w-100" 
+                                                        src="{{ $image }}"
+                                                        onerror="this.onerror=null; this.src='{{ URL::asset('assets/img/photos/13.jpg') }}'; this.parentNode.querySelector('.fallback-text').style.display = 'block';"
+                                                    > --}}
+                                                    <img 
+                                                        style="object-fit: cover; width: 100%; height: 100%;" 
+                                                        alt="Room image" 
+                                                        class="d-block w-100" 
+                                                        src="{{ URL::asset($image) }}"
+                                                        onerror="this.onerror=null; this.src='{{ URL::asset('assets/img/photos/13.jpg') }}'; this.parentNode.querySelector('.fallback-text').style.display = 'block';"
+                                                    >
+                                                    <div class="fallback-text text-light w-100 text-center" 
+                                                         style="font-size: 17px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
+                                                        No Image Available
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="carousel-item active">
+                                            <div style="position: relative; height: 200px; overflow: hidden;">
+                                                <img 
+                                                    style="object-fit: cover; width: 100%; height: 100%;" 
+                                                    alt="No image available" 
+                                                    class="d-block w-100" 
+                                                    src="{{ URL::asset('assets/img/photos/13.jpg') }}"
+                                                >
+                                                <div class="fallback-text text-light w-100 text-center" 
+                                                     style="font-size: 17px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                                    No Image Available
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                                <a class="carousel-control-prev" href="#carouselExample2-{{ $room->id }}" role="button" data-slide="prev">
+                                    <i class="fa fa-angle-left fs-30" aria-hidden="true"></i>
+                                </a>
+                                <a class="carousel-control-next" href="#carouselExample2-{{ $room->id }}" role="button" data-slide="next">
+                                    <i class="fa fa-angle-right fs-30" aria-hidden="true"></i>
+                                </a>
+                            </div>                            
+                            <a href="#" class="adtocart" style="left: 43% !important;"> <i class="las la-notes-medical"></i>
+                            </a>
                         </div>
-                        <img class="w-100" src="{{URL::asset('assets/img/ecommerce/01.jpg')}}" alt="product-image">
-                        <a href="#" class="adtocart"> <i class="las la-shopping-cart "></i>
-                        </a>
-                    </div>
-                    <div class="text-center pt-3">
-                        <h3 class="h6 mb-2 mt-4 font-weight-bold text-uppercase">FLOWER POT</h3>
-                        <span class="tx-15 ml-auto">
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star-half text-warning"></i>
-                            <i class="ion ion-md-star-outline text-warning"></i>
-                        </span>
-                        <h4 class="h5 mb-0 mt-2 text-center font-weight-bold text-danger">$26 <span class="text-secondary font-weight-normal tx-13 ml-1 prev-price">$59</span></h4>
+                        <div class="pt-3">
+                            <div class="d-flex justify-content-between align-items-center pt-3 pb-1 px-1">
+                                <span class="font-weight-bold tx-16 text-uppercase">{{ $room->nbr }}</span>
+                                <span style="font-size: 12px !important;" class="text-capitalize font-weight-bold badge badge-dark">
+                                    {{ $room->type }}
+                                </span>
+                            </div>
+                            <span class="text-secondary font-weight-normal tx-13 px-1 description" title="{{ $room->description }}" data-toggle="tooltip" data-placement="bottom">
+                                {{ $room->description }}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6 col-lg-6 col-xl-4  col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="pro-img-box">
-                        <div class="d-flex product-sale">
-                            <i class="mdi mdi-heart text-danger ml-auto wishlist"></i>
-                        </div>
-                        <img class="w-100" src="{{URL::asset('assets/img/ecommerce/02.jpg')}}" alt="product-image">
-                        <a href="#" class="adtocart"> <i class="las la-shopping-cart "></i>
-                        </a>
-                    </div>
-                    <div class="text-center pt-3">
-                        <h3 class="h6 mb-2 mt-4 font-weight-bold text-uppercase">Chair</h3>
-                        <span class="tx-15 ml-auto">
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star-half text-warning"></i>
-                            <i class="ion ion-md-star-outline text-warning"></i>
-                        </span>
-                        <h4 class="h5 mb-0 mt-2 text-center font-weight-bold text-danger">$35 <span class="text-secondary font-weight-normal tx-13 ml-1 prev-price">$79</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-6 col-xl-4  col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="pro-img-box">
-                        <div class="d-flex product-sale">
-                            <div class="badge bg-success">New</div>
-                            <i class="mdi mdi-heart-outline ml-auto wishlist"></i>
-                        </div>
-                        <img class="w-100" src="{{URL::asset('assets/img/ecommerce/03.jpg')}}" alt="product-image">
-                        <a href="#" class="adtocart"> <i class="las la-shopping-cart "></i>
-                        </a>
-                    </div>
-                    <div class="text-center pt-3">
-                        <h3 class="h6 mb-2 mt-4 font-weight-bold text-uppercase">Hiking Boots</h3>
-                        <span class="tx-15 ml-auto">
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star-half text-warning"></i>
-                            <i class="ion ion-md-star-outline text-warning"></i>
-                        </span>
-                        <h4 class="h5 mb-0 mt-2 text-center font-weight-bold text-danger">$25 <span class="text-secondary font-weight-normal tx-13 ml-1 prev-price">$59</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-6 col-xl-4  col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="pro-img-box">
-                        <div class="d-flex product-sale">
-                            <div class="badge bg-success">New</div>
-                            <i class="mdi mdi-heart-outline ml-auto wishlist"></i>
-                        </div>
-                        <img class="w-100" src="{{URL::asset('assets/img/ecommerce/06.jpg')}}" alt="product-image">
-                        <a href="#" class="adtocart"> <i class="las la-shopping-cart "></i>
-                        </a>
-                    </div>
-                    <div class="text-center pt-3">
-                        <h3 class="h6 mb-2 mt-4 font-weight-bold text-uppercase">college  bag</h3>
-                        <span class="tx-15 ml-auto">
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star-half text-warning"></i>
-                            <i class="ion ion-md-star-outline text-warning"></i>
-                        </span>
-                        <h4 class="h5 mb-0 mt-2 text-center font-weight-bold text-danger">$35 <span class="text-secondary font-weight-normal tx-13 ml-1 prev-price">$69</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-6 col-xl-4  col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="pro-img-box">
-                        <div class="d-flex product-sale">
-                            <i class="mdi mdi-heart ml-auto wishlist text-danger"></i>
-                        </div>
-                        <img class="w-100" src="{{URL::asset('assets/img/ecommerce/04.jpg')}}" alt="product-image">
-                        <a href="#" class="adtocart"> <i class="las la-shopping-cart"></i>
-                        </a>
-                    </div>
-                    <div class="text-center pt-3">
-                        <h3 class="h6 mb-2 mt-4 font-weight-bold text-uppercase">Headphones</h3>
-                        <span class="tx-15 ml-auto">
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star-half text-warning"></i>
-                            <i class="ion ion-md-star-outline text-warning"></i>
-                        </span>
-                        <h4 class="h5 mb-0 mt-2 text-center font-weight-bold text-danger">$46 <span class="text-secondary font-weight-normal tx-13 ml-1 prev-price">$89</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-6 col-xl-4  col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="pro-img-box">
-                        <div class="d-flex product-sale">
-                            <i class="mdi mdi-heart-outline ml-auto wishlist"></i>
-                        </div>
-                        <img class="w-100" src="{{URL::asset('assets/img/ecommerce/05.jpg')}}" alt="product-image">
-                        <a href="#" class="adtocart"> <i class="las la-shopping-cart "></i>
-                        </a>
-                    </div>
-                    <div class="text-center pt-3">
-                        <h3 class="h6 mb-2 mt-4 font-weight-bold text-uppercase">Camera lens</h3>
-                        <span class="tx-15 ml-auto">
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star-half text-warning"></i>
-                            <i class="ion ion-md-star-outline text-warning"></i>
-                        </span>
-                        <h4 class="h5 mb-0 mt-2 text-center font-weight-bold text-danger">$159 <span class="text-secondary font-weight-normal tx-13 ml-1 prev-price">$299</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-6 col-xl-4  col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="pro-img-box">
-                        <div class="d-flex product-sale">
-                            <div class="badge bg-purple">New</div>
-                            <i class="mdi mdi-heart ml-auto wishlist text-danger"></i>
-                        </div>
-                        <img class="w-100" src="{{URL::asset('assets/img/ecommerce/09.jpg')}}" alt="product-image">
-                        <a href="#" class="adtocart"> <i class="las la-shopping-cart "></i>
-                        </a>
-                    </div>
-                    <div class="text-center pt-3">
-                        <h3 class="h6 mb-2 mt-4 font-weight-bold text-uppercase">Camera</h3>
-                        <span class="tx-15 ml-auto">
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star-half text-warning"></i>
-                            <i class="ion ion-md-star-outline text-warning"></i>
-                        </span>
-                        <h4 class="h5 mb-0 mt-2 text-center font-weight-bold text-danger">$129 <span class="text-secondary font-weight-normal tx-13 ml-1 prev-price">$189</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-6 col-xl-4  col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="pro-img-box">
-                        <div class="d-flex product-sale">
-                            <i class="mdi mdi-heart-outline ml-auto wishlist"></i>
-                        </div>
-                        <img class="w-100" src="{{URL::asset('assets/img/ecommerce/11.jpg')}}" alt="product-image">
-                        <a href="#" class="adtocart"> <i class="las la-shopping-cart "></i>
-                        </a>
-                    </div>
-                    <div class="text-center pt-3">
-                        <h3 class="h6 mb-2 mt-4 font-weight-bold text-uppercase">Handbag</h3>
-                        <span class="tx-15 ml-auto">
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star-half text-warning"></i>
-                            <i class="ion ion-md-star-outline text-warning"></i>
-                        </span>
-                        <h4 class="h5 mb-0 mt-2 text-center font-weight-bold text-danger">$19 <span class="text-secondary font-weight-normal tx-13 ml-1 prev-price">$39</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-6 col-xl-4  col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <div class="pro-img-box">
-                        <div class="d-flex product-sale">
-                            <div class="badge bg-info">New</div>
-                            <i class="mdi mdi-heart ml-auto wishlist text-danger"></i>
-                        </div>
-                        <img class="w-100" src="{{URL::asset('assets/img/ecommerce/07.jpg')}}" alt="product-image">
-                        <a href="#" class="adtocart"> <i class="las la-shopping-cart "></i>
-                        </a>
-                    </div>
-                    <div class="text-center pt-3">
-                        <h3 class="h6 mb-2 mt-4 font-weight-bold text-uppercase">Laptop</h3>
-                        <span class="tx-15 ml-auto">
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star text-warning"></i>
-                            <i class="ion ion-md-star-half text-warning"></i>
-                            <i class="ion ion-md-star-outline text-warning"></i>
-                        </span>
-                        <h4 class="h5 mb-0 mt-2 text-center font-weight-bold text-danger">$89 <span class="text-secondary font-weight-normal tx-13 ml-1 prev-price">$120</span></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <ul class="pagination product-pagination mr-auto float-left">
-            <li class="page-item page-prev disabled">
-                <a class="page-link" href="#" tabindex="-1">Prev</a>
-            </li>
-            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item"><a class="page-link" href="#">4</a></li>
-            <li class="page-item"><a class="page-link" href="#">5</a></li>
-            <li class="page-item page-next">
-                <a class="page-link" href="#">Next</a>
-            </li>
-        </ul>
+        @endforeach
     </div>
+
+    <!-- Custom Pagination -->
+    <ul class="pagination product-pagination mr-auto float-left">
+        <!-- Previous Page Link -->
+        <li class="page-item page-prev {{ $rooms->onFirstPage() ? 'disabled' : '' }}">
+            <a class="page-link" href="{{ $rooms->previousPageUrl() }}" tabindex="-1">Prev</a>
+        </li>
+
+        <!-- Page Number Links -->
+        @for ($i = 1; $i <= $rooms->lastPage(); $i++)
+            <li class="page-item {{ $rooms->currentPage() == $i ? 'active' : '' }}">
+                <a class="page-link" href="{{ $rooms->appends(request()->except('page'))->url($i) }}">{{ $i }}</a>
+            </li>
+        @endfor
+
+        <!-- Next Page Link -->
+        <li class="page-item page-next {{ $rooms->hasMorePages() ? '' : 'disabled' }}">
+            <a class="page-link" href="{{ $rooms->nextPageUrl() }}">Next</a>
+        </li>
+    </ul>
 </div>
 @endsection
 
 @section('js')
+<!--Internal  Parsley.min js -->
+<script src="{{URL::asset('assets/plugins/parsleyjs/parsley.min.js')}}"></script>
 
+<script>
+    $(document).ready(function() {
+        'use strict';
+
+        $('#addRoomForm').parsley();
+
+        $('#customFile').on('change', function() {
+            var fileCount = $(this)[0].files.length;
+            var label = fileCount === 0 ? 'Choose files' : fileCount + ' file(s) selected';
+            $('#file-count-label').text(label);
+
+            var files = $(this)[0].files;
+            var valid = true;
+            var typeErrorFiles = [];
+            var sizeErrorFiles = [];
+
+            $.each(files, function(index, file) {
+                if (!file.type.match('image/jpeg') && !file.type.match('image/png') && !file.type.match('image/jpg')) {
+                    valid = false;
+                    typeErrorFiles.push(index + 1);
+                }
+
+                if (file.size > 2048 * 1024) {
+                    valid = false;
+                    sizeErrorFiles.push(index + 1);
+                }
+            });
+
+            var errorMessages = [];
+
+            if (typeErrorFiles.length > 0) {
+                errorMessages.push("File " + typeErrorFiles.join(', ') + " must be of type jpeg, png, or jpg.");
+            }
+            if (sizeErrorFiles.length > 0) {
+                errorMessages.push("File " + sizeErrorFiles.join(', ') + " is too large. Maximum size is 2MB.");
+            }
+
+            if (!valid) {
+                $('#images-error').html(errorMessages.join('<br>'));
+            } else {
+                $('#images-error').text('');
+            }
+        });
+
+
+        $('#addRoomForm').on('submit', function(event) {
+            event.preventDefault();
+
+            if ($(this).parsley().isValid() && $('#images-error').text() === '') {
+        
+                $('.error').text('');
+
+                let formData = new FormData(this);
+                const action = $(this).data('action');
+                const method = $(this).data('method');
+
+                $.ajax({
+                    url: action,
+                    type: method,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('#addRoomModal').modal('hide');
+                        $('#addRoomForm')[0].reset();
+                        window.location.reload();
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            $.each(errors, function(key, error) {
+                                $(`#${key}-error`).text(error[0]);
+                            });
+                        }
+                    }
+                });
+            }
+        });
+
+        $('#editRoomForm').on('submit', function(event) {
+            event.preventDefault();
+            
+            const action = $(this).data('action');
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: action,
+                method: "PUT",
+                data: formData,
+                success: function(response) {
+                    $('#editRoomModal').modal('hide');
+                    window.location.reload();
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        const errors = xhr.responseJSON.errors;
+                        $.each(errors, function(key, value) {
+                            $(`#${key}-error`).text(value[0]);
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+    function openEditModal(roomId) {
+        $.ajax({
+            url: `/rooms/${roomId}/edit`,
+            method: "GET",
+            success: function(room) {
+                $('#editRoomForm #room_number').val(room.number);
+                $('#editRoomForm #floor').val(room.floor);
+                $('#editRoomForm #price').val(room.price);
+                
+                // Set the form action URL for updating the room
+                $('#editRoomForm').attr('data-action', `/rooms/${roomId}`);
+                
+                // Show the edit modal
+                $('#editRoomModal').modal('show');
+            }
+        });
+    }
+
+    function deleteRoom(roomId) {
+        $('#deleteRoomModal').modal('show');
+
+        $('#confirmDeleteRoom').off('click').on('click', function () {
+            const csrfToken = $('#csrf-token').val();
+
+            $.ajax({
+                url: `/rooms/${roomId}`,
+                method: "DELETE",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                success: function(response) {
+                    $('#deleteRoomModal').modal('hide');
+                    window.location.reload();
+                },
+                error: function(xhr) {
+                    alert("Failed to delete the room. Please try again.");
+                }
+            });
+        });
+    }
+
+</script>
 @endsection

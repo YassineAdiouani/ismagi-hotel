@@ -3,7 +3,8 @@
 @section('css')
     <style>
         .description {
-            max-width: 250px; /* Set max-width based on your layout */
+            display: inline-block;
+            max-width: 100%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -34,7 +35,7 @@
             </div>
         </div>
 
-        <div class="modal" id="addRoomModal">
+        <div class="modal fade" id="addRoomModal">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content modal-content-demo">
                     <div class="modal-header">
@@ -116,7 +117,7 @@
             </div>
         </div>        
 
-        <div class="modal" id="editRoomModal">
+        <div class="modal fade" id="editRoomModal">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -235,7 +236,7 @@
                                     </span>
                                     <div  class="dropdown-menu tx-13">
                                         <a class="dropdown-item" href="#">Details</a>
-                                        <span class="dropdown-item" onclick="openEditModal({{ $room->id }})">Update</span>
+                                        <span class="dropdown-item" style="cursor: pointer;" onclick="openEditModal({{ $room->id }})">Update</span>
                                         <span style="cursor: pointer;" class="dropdown-item" onclick="deleteRoom({{ $room->id }})">Delete</span>
                                     </div>
                                 </div>
@@ -250,20 +251,20 @@
                                         @foreach($images as $index => $image)
                                             <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
                                                 <div style="position: relative; height: 200px; overflow: hidden;">
-                                                    {{-- <img 
+                                                    <img 
                                                         style="object-fit: cover; width: 100%; height: 100%;" 
                                                         alt="Room image" 
                                                         class="d-block w-100" 
                                                         src="{{ $image }}"
                                                         onerror="this.onerror=null; this.src='{{ URL::asset('assets/img/photos/13.jpg') }}'; this.parentNode.querySelector('.fallback-text').style.display = 'block';"
-                                                    > --}}
-                                                    <img 
+                                                    >
+                                                    {{-- <img 
                                                         style="object-fit: cover; width: 100%; height: 100%;" 
                                                         alt="Room image" 
                                                         class="d-block w-100" 
                                                         src="{{ URL::asset($image) }}"
                                                         onerror="this.onerror=null; this.src='{{ URL::asset('assets/img/photos/13.jpg') }}'; this.parentNode.querySelector('.fallback-text').style.display = 'block';"
-                                                    >
+                                                    > --}}
                                                     <div class="fallback-text text-light w-100 text-center" 
                                                          style="font-size: 17px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: none;">
                                                         No Image Available
@@ -451,7 +452,7 @@
             url: `/rooms/${roomId}/edit`,
             method: "GET",
             success: function(room) {
-                $('#editRoomForm #room_number').val(room.number);
+                $('#editRoomForm #room_number').val(room.nbr);
                 $('#editRoomForm #floor').val(room.floor);
                 $('#editRoomForm #price').val(room.price);
                 

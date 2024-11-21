@@ -256,11 +256,6 @@
                             </div>
                         
                             <div class="form-group">
-                                <label for="total_price">Total Price</label>
-                                <input type="number" id="total_price" name="total_price" class="form-control" required>
-                            </div>
-                        
-                            <div class="form-group">
                                 <label for="status">Status</label>
                                 <select id="status" name="status" class="form-control">
                                     <option value="Pending">Pending</option>
@@ -268,13 +263,18 @@
                                     <option value="Canceled">Canceled</option>
                                 </select>
                             </div>
+
+                            <div class="form-group">
+                                <label for="total_price">Total Price</label>
+                                <input type="number" id="total_price" name="total_price" class="form-control" value="0.00" readonly>
+                            </div>
                         
                             <div class="modal-footer">
                                 <button type="submit" class="btn ripple btn-primary">Save</button>
                                 <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">Close</button>
                             </div>
                         </form>
-                        
+
                     </div>
                 </div>
             </div>
@@ -651,12 +651,48 @@
                 if (!room.id) {
                     return room.text;
                 }
-                return $('<option></option>').attr('value', room.id).html(`${room.nbr} (${room.type})`);
+                return $('<option></option>').attr('value', room.id)
+                .html(`<span class="d-flex justify-content-between"><span>${room.nbr} (${room.type})</span><span>$${room.price}</span></span>`);
             }
 
             function formatRoomSelection(room) {
                 return room.text || room.name; 
             }
+
+            let roomPrice = 0;
+            $('#room_id').on('select2:select', function (e) {
+                const selectedRoom = e.params.data;
+                roomPrice = parseFloat(selectedRoom.price);
+                calculateTotalPrice();
+            });
+
+            $('#check_in, #check_out').on('change', calculateTotalPrice);
+
+            function calculateTotalPrice() {
+                const checkInDate = new Date($('#check_in').val());
+                const checkOutDate = new Date($('#check_out').val());
+
+                if (checkInDate && checkOutDate && roomPrice > 0) {
+                    const timeDifference = checkOutDate - checkInDate;
+                    const dayCount = timeDifference / (1000 * 60 * 60 * 24);
+
+                    if (dayCount > 0) {
+                        const totalPrice = dayCount * roomPrice;
+                        $('#total_price').val(totalPrice.toFixed(2));
+                    } else {
+                        $('#total_price').val('0.00');
+                    }
+                }
+            }
+
+            $('#addReservationModal').on('hidden.bs.modal', function () {
+                $('#addReservationForm')[0].reset();
+
+                $('#client_id').val(null).trigger('change');
+                $('#room_id').val(null).trigger('change');
+
+                $('#total_price').val('0.00');
+            });
         });
     </script>
 @endsection

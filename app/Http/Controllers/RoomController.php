@@ -21,6 +21,7 @@ class RoomController extends Controller
                 'text' => $room->nbr . ' - ' . $room->type,
                 'nbr' => $room->nbr,
                 'type' => $room->type,
+                'price' => $room->price
             ];
         });
 

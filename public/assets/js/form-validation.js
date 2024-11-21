@@ -10,5 +10,5 @@ $(function() {
 		});
 	});
 	$('#selectForm').parsley();
-	$('#selectForm2').parsley();
+	$('#addClientForm').parsley();
 });

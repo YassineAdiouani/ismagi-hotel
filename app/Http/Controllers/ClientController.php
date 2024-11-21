@@ -7,6 +7,31 @@ use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
+
+    public function autocomplete(Request $request)
+    {
+        $term = $request->get('term');
+        
+        // Perform the search
+        $clients = Client::where('first_name', 'LIKE', "%{$term}%")
+            ->orWhere('last_name', 'LIKE', "%{$term}%")
+            ->orWhere('cin', 'LIKE', "%{$term}%")
+            ->get();
+
+        // Map the results for Select2
+        $results = $clients->map(function ($client) {
+            return [
+                'id' => $client->id,
+                'text' => "{$client->first_name} {$client->last_name}",
+                'first_name' => $client->first_name,
+                'last_name' => $client->last_name,
+                'cin' => $client->cin,
+            ];
+        });
+
+        return response()->json($results);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -38,7 +63,7 @@ class ClientController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'cin' => 'required|string|max:255',
+            'cin' => 'required|string|max:255|unique:clients,cin',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255|unique:clients,email',

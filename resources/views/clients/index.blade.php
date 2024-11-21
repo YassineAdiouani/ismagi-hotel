@@ -50,7 +50,7 @@
                 </button>
             </div>
         </div>
-        <div class="modal" id="addClientsModal">
+        <div class="modal fade" id="addClientsModal">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content modal-content-demo">
 					<div class="modal-header">
@@ -110,7 +110,7 @@
 			</div>
 		</div>
 
-        <div class="modal" id="editClientModal">
+        <div class="modal fade" id="editClientModal">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">

@@ -1,0 +1,34 @@
+/* Toast container */
+.demo-static-toast {
+    position: absolute;
+    top: -15px;
+    right: 3px;
+    z-index: 9999;
+    animation: slideInFromRight 0.53s ease-in-out; /* Slide-in effect */
+}
+
+/* Slide-in animation from right to left */
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100%); /* Start off the screen */
+    }
+    100% {
+        transform: translateX(0%); /* End at normal position */
+    }
+}
+
+/* Slide-out animation from right to left (for disappearing toast) */
+@keyframes slideOutToRight {
+    0% {
+        transform: translateX(0%); /* Start at normal position */
+    }
+
+    100% {
+        transform: translateX(100%); /* Slide off to the right */
+    }
+}
+
+/* Class for the slide-out animation */
+.toast-slide-out {
+    animation: slideOutToRight 0.53s ease-in-out forwards;
+}

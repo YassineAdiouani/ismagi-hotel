@@ -221,10 +221,10 @@
                         <div class="pro-img-box">
                             <div class="d-flex product-sale d-flex justify-content-between">
                                 <div style="position: relative; z-index: 100;" class="badge text-capitalize font-weight-bolder
-                                    @if($room->status == 'available') bg-success
-                                    @elseif($room->status == 'reserved') bg-info
-                                    @elseif($room->status == 'maintenance') badge-dark 
-                                    @elseif($room->status == 'occupied') bg-danger 
+                                    @if($room->status == 'available') bg-success-gradient
+                                    @elseif($room->status == 'reserved') bg-warning-gradient
+                                    @elseif($room->status == 'maintenance') bg-danger-gradient
+                                    @elseif($room->status == 'occupied') bg-info-gradient
                                     @endif
                                 ">
                                     {{ $room->status }}
@@ -302,8 +302,13 @@
                         <div class="pt-3">
                             <div class="d-flex justify-content-between align-items-center pt-3 pb-1 px-1">
                                 <span class="font-weight-bold tx-16 text-uppercase">{{ $room->nbr }}</span>
-                                <span style="font-size: 12px !important;" class="text-capitalize font-weight-bold badge badge-dark">
-                                    {{ $room->type }}
+                                <span>
+                                    <span class="px-1">
+                                        ${{ $room->price}}
+                                    </span>
+                                    <span style="font-size: 12px !important;" class="text-capitalize font-weight-bold badge badge-dark">
+                                        {{ $room->type }}
+                                    </span>
                                 </span>
                             </div>
                             <span class="text-secondary font-weight-normal tx-13 px-1 description" title="{{ $room->description }}" data-toggle="tooltip" data-placement="bottom">
@@ -385,7 +390,6 @@
                 $('#images-error').text('');
             }
         });
-
 
         $('#addRoomForm').on('submit', function(event) {
             event.preventDefault();

@@ -31,6 +31,31 @@ class DashboardController extends Controller
         $types = ['single', 'double', 'suite'];
         $typeTotals = array_merge(array_fill_keys($types, 0), $typeCounts->toArray());
 
-        return view('dashboard.index', compact('totalRooms', 'totalClients', 'statusTotals', 'typeTotals'));
+        $topReservedRooms = DB::table('reservations')
+            ->select( 'rooms.id', 'rooms.nbr', 'rooms.type', 'rooms.price', DB::raw('COUNT(reservations.id) as reservation_count'))
+            ->join('rooms', 'reservations.room_id', '=', 'rooms.id')
+            ->groupBy('rooms.id', 'rooms.nbr', 'rooms.type', 'rooms.price')
+            ->orderByDesc('reservation_count')
+            ->limit(5)
+            ->get();
+
+        $topClients = DB::table('reservations')
+            ->select(
+                'clients.id',
+                DB::raw("CONCAT(clients.first_name, ' ', clients.last_name) as full_name"),
+                'clients.cin',
+                DB::raw('COUNT(reservations.id) as reservation_count'),
+                DB::raw('SUM(reservations.total_price) as total_spent')
+            )
+            ->join('clients', 'reservations.client_id', '=', 'clients.id')
+            ->groupBy('clients.id', 'clients.first_name', 'clients.last_name', 'clients.cin')
+            ->orderByDesc('reservation_count')
+            ->limit(5)
+            ->get();
+
+        $clients = Client::all();
+        $rooms = Room::all();  
+
+        return view('dashboard.index', compact('totalRooms', 'totalClients', 'statusTotals', 'typeTotals', 'topReservedRooms', 'topClients', 'clients', 'rooms'));
     }
 }

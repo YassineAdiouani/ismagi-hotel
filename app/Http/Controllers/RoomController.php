@@ -7,6 +7,26 @@ use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
+
+    public function autocomplete(Request $request)
+    {
+        $term = $request->get('term');
+        $rooms = Room::where('nbr', 'LIKE', "%{$term}%")
+            ->orWhere('type', 'LIKE', "%{$term}%")
+            ->get();
+
+        $results = $rooms->map(function ($room) {
+            return [
+                'id' => $room->id,
+                'text' => $room->nbr . ' - ' . $room->type,
+                'nbr' => $room->nbr,
+                'type' => $room->type,
+            ];
+        });
+
+        return response()->json($results);
+    }
+
     /**
      * Display a listing of the resource.
      */

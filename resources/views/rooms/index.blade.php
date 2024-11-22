@@ -235,7 +235,6 @@
                                         <i class="fe fe-align-right px-1" style="font-size: 13px;" data-toggle="tooltip" data-placement="bottom" title="Actions"></i>
                                     </span>
                                     <div  class="dropdown-menu tx-13">
-                                        <a class="dropdown-item" href="#">Details</a>
                                         <span class="dropdown-item" style="cursor: pointer;" onclick="openEditModal({{ $room->id }})">Update</span>
                                         <span style="cursor: pointer;" class="dropdown-item" onclick="deleteRoom({{ $room->id }})">Delete</span>
                                     </div>
@@ -296,16 +295,19 @@
                                     <i class="fa fa-angle-right fs-30" aria-hidden="true"></i>
                                 </a>
                             </div>                            
-                            <a href="#" class="adtocart" style="left: 43% !important;"> <i class="las la-notes-medical"></i>
-                            </a>
+                            {{-- <a href="#" class="adtocart" style="left: 43% !important;"> <i class="las la-notes-medical"></i>
+                            </a> --}}
+                            <div class="adtocart d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <strong>
+                                    ${{ $room->price}}
+                                </strong>
+                            </div>
                         </div>
                         <div class="pt-3">
                             <div class="d-flex justify-content-between align-items-center pt-3 pb-1 px-1">
                                 <span class="font-weight-bold tx-16 text-uppercase">{{ $room->nbr }}</span>
                                 <span>
-                                    <span class="px-1">
-                                        ${{ $room->price}}
-                                    </span>
+                                    
                                     <span style="font-size: 12px !important;" class="text-capitalize font-weight-bold badge badge-dark">
                                         {{ $room->type }}
                                     </span>

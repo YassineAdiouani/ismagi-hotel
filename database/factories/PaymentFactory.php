@@ -24,7 +24,7 @@ class PaymentFactory extends Factory
             'reservation_id' => \App\Models\Reservation::factory(),
             'amount' => $this->faker->randomFloat(2, 20, 1000),
             'payment_date' => $this->faker->date(),
-            'payment_method' => $this->faker->randomElement(['credit card', 'cash', 'paypal']),
+            'payment_method' => $this->faker->randomElement(['cash', 'credit_card', 'paypal', 'bank_transfer']),
             'status' => $this->faker->randomElement(['pending', 'completed', 'failed']),
         ];
     }

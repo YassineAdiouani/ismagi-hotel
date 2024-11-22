@@ -19,8 +19,10 @@ use App\Http\Controllers\RoomController;
 |
 */
 
-Route::get('/', function () {
-    return view('index');
+Route::group(['prefix' => '', 'as' => 'dashboard.'], function () {
+    Route::controller(DashboardController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+    });
 });
 
 Route::get('/clients/autocomplete', [ClientController::class, 'autocomplete'])->name('clients.autocomplete');
@@ -31,12 +33,6 @@ Route::resource('rooms', RoomController::class);
 Route::resource('reservations', ReservationController::class);
 Route::resource('payments', PaymentController::class);
 
-Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
-    Route::controller(DashboardController::class)->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::get('/stats', 'stats')->name('stats');
-        Route::get('/profile', 'profile')->name('profile');
-    });
-});
+
 
 Route::get('/{page}', [AdminController::class, 'index']);

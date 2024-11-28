@@ -130,7 +130,31 @@ class RoomController extends Controller
      */
     public function update(Request $request, Room $room)
     {
-        $room->update($request->all());
+        // Validate the request data
+        $validatedData = $request->validate([
+            'nbr' => 'required|string|max:255',
+            'floor' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'type' => 'required|in:single,double,suite',
+            'status' => 'required|in:available,reserved,maintenance,occupied',
+            'description' => 'nullable|string',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $room->update($validatedData);
+
+        if ($request->hasFile('images')) {
+            $imagePaths = [];
+
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('rooms', 'public');
+            }
+
+            $existingImages = $room->images ? json_decode($room->images, true) : [];
+            $room->images = json_encode(array_merge($existingImages, $imagePaths));
+            $room->save();
+        }
+
         return response()->json(['message' => 'Room updated successfully']);
     }
 

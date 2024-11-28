@@ -11,6 +11,13 @@
     #reservationsTable {
         width: 99%;
     }
+    .phone_select_input .iti--allow-dropdown {
+        width: 100% !important;
+    }
+    #addClientsModal .iti__flag-container .iti__selected-flag {
+        height: 37px;
+        width: 70px;
+    }
 </style>
 <!-- Internal Data table css -->
 <link href="{{URL::asset('assets/plugins/datatable/css/dataTables.bootstrap4.min.css')}}" rel="stylesheet" />
@@ -18,6 +25,14 @@
 <link href="{{URL::asset('assets/plugins/datatable/css/responsive.bootstrap4.min.css')}}" rel="stylesheet" />
 <link href="{{URL::asset('assets/plugins/datatable/css/jquery.dataTables.min.css')}}" rel="stylesheet">
 <link href="{{URL::asset('assets/plugins/datatable/css/responsive.dataTables.min.css')}}" rel="stylesheet">
+
+<!-- Select2 CSS -->
+<link href="{{ URL::asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
+<!-- Link to the custom toast styles -->
+<link rel="stylesheet" href="{{ URL::asset('assets/custom/toast.css') }}">
+
+<!--Internal  TelephoneInput css-->
+<link rel="stylesheet" href="{{ URL::asset('assets/plugins/telephoneinput/telephoneinput-rtl.css') }}">
 @endsection
 
 @section('page-header')
@@ -76,7 +91,7 @@
                                     <td>{{ $reservation->total_price }}</td>
                                     <td>{{ $reservation->status }}</td>
                                     <td>
-                                        <button type="button" onclick="openEditModal({{ $reservation->id }})" class="btn btn-sm btn-primary mx-1">
+                                        <button type="button" onclick="openEditReservationModal({{ $reservation->id }})" class="btn btn-sm btn-primary mx-1">
                                             <i class="mdi mdi-account-edit"></i>
                                         </button>
                                         <button type="button" onclick="deleteReservation({{ $reservation->id }})" class="btn btn-sm btn-danger mx-1">
@@ -181,6 +196,117 @@
 </div>
 
 <!-- Edit and Delete Modals would be similar -->
+<div class="modal fade" id="deleteReservationModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+                <i class="mdi mdi-alert-circle-outline tx-100 tx-danger mg-t-20 d-inline-block"></i>
+                <h4 class="tx-danger mg-b-20">Confirm Deletion</h4>
+                <p class="mg-b-20">Are you sure you want to delete this reservation?</p>
+                
+                <!-- Hidden CSRF token input -->
+                <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
+
+                <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Reservation Modal -->
+<div class="modal fade" id="editReservationModal" tabindex="-1" aria-labelledby="editReservationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editReservationModalLabel">Edit Reservation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editReservationForm">
+                    @csrf
+                    @method('PUT') <!-- Spoofing the PUT request -->
+
+                    <!-- Client Selection -->
+                    <div class="form-group d-flex flex-column w-100">
+                        <label for="edit_client_id">Client <span class="tx-danger">*</span></label>
+                        <select id="edit_client_id" name="client_id" class="form-control select2-show-search">
+                            <option value="" disabled>Select a client</option>
+                            <!-- Options dynamically populated -->
+                        </select>
+                    </div>
+
+                    <!-- Room Selection -->
+                    <div class="form-group d-flex flex-column w-100">
+                        <label for="edit_room_id">Room <span class="tx-danger">*</span></label>
+                        <select id="edit_room_id" name="room_id" class="form-control select2">
+                            <option value="" disabled>Select a room</option>
+                            <!-- Options dynamically populated -->
+                        </select>
+                    </div>
+
+                    <!-- Check-In and Check-Out Dates -->
+                    <div class="d-flex justify-content-between">
+                        <div class="form-group w-50 pr-2">
+                            <label for="edit_check_in">Check-In <span class="tx-danger">*</span></label>
+                            <input type="date" id="edit_check_in" name="check_in" class="form-control">
+                        </div>
+                        <div class="form-group w-50 pl-2">
+                            <label for="edit_check_out">Check-Out <span class="tx-danger">*</span></label>
+                            <input type="date" id="edit_check_out" name="check_out" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Status Selection -->
+                    <div class="form-group">
+                        <label for="edit_status">Status <span class="tx-danger">*</span></label>
+                        <select id="edit_status" name="status" class="form-control">
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="canceled">Canceled</option>
+                        </select>
+                    </div>
+
+                    <!-- Payment Method and Status -->
+                    <div class="d-flex justify-content-between">
+                        <div class="form-group w-50 pr-2">
+                            <label for="edit_payment_method">Payment Method <span class="tx-danger">*</span></label>
+                            <select id="edit_payment_method" name="payment_method" class="form-control">
+                                <option value="cash">Cash</option>
+                                <option value="credit_card">Credit Card</option>
+                                <option value="paypal">Paypal</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                        <div class="form-group w-50 pl-2">
+                            <label for="edit_payment_status">Payment Status <span class="tx-danger">*</span></label>
+                            <select id="edit_payment_status" name="payment_status" class="form-control">
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="failed">Failed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Total Price -->
+                    <div class="form-group">
+                        <label for="edit_total_price">Total Price <span class="tx-danger">*</span></label>
+                        <input type="number" id="edit_total_price" name="total_price" class="form-control" readonly>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('js')
@@ -223,14 +349,222 @@
                 lengthMenu: '_MENU_',
             },
         });
+
+        $('#edit_client_id').select2({
+            placeholder: 'Select a client',
+            ajax: {
+                url: "{{ route('clients.autocomplete') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return { term: params.term };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.map(function(item) {
+                            return {
+                                id: item.id,
+                                text: `${item.first_name || ''} ${item.last_name || ''}`,
+                                first_name: item.first_name,
+                                last_name: item.last_name,
+                                cin: item.cin
+                            };
+                        })
+                    };
+                }
+            },
+            templateResult: formatClient,
+            templateSelection: formatClientSelection
+        });
+
+        function formatClient(client) {
+            if (!client.id) {
+                return client.text;
+            }
+            return $('<option></option>').attr('value', client.id)
+                .html(`${client.first_name} ${client.last_name} <span>(${client.cin})</span>`);
+        }
+
+        function formatClientSelection(client) {
+            return client.text || `${client.first_name} ${client.last_name}`;
+        }
+
+        // Select2 for editing rooms
+        $('#edit_room_id').select2({
+            placeholder: 'Select a room',
+            ajax: {
+                url: "{{ route('rooms.autocomplete') }}",
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return { term: params.term };
+                },
+                processResults: function(data) {
+                    return { results: data };
+                }
+            },
+            templateResult: formatRoom,
+            templateSelection: formatRoomSelection
+        });
+
+        function formatRoom(room) {
+            if (!room.id) {
+                return room.text;
+            }
+            return $('<option></option>').attr('value', room.id)
+                .html(`<span class="d-flex justify-content-between"><span>${room.nbr} (${room.type})</span><span>$${room.price}</span></span>`);
+        }
+
+        function formatRoomSelection(room) {
+            return room.text || room.name;
+        }
+
+        let roomPrice = 0;
+        $('#edit_room_id').on('select2:select', function(e) {
+            const selectedRoom = e.params.data;
+            roomPrice = parseFloat(selectedRoom.price);
+            calculateTotalPrice();
+        });
+
+        // Calculate total price
+        function calculateTotalPrice() {
+            const checkInDate = new Date($('#edit_check_in').val());
+            const checkOutDate = new Date($('#edit_check_out').val());
+
+            if (checkInDate && checkOutDate && roomPrice > 0) {
+                const timeDifference = checkOutDate - checkInDate;
+                const dayCount = timeDifference / (1000 * 60 * 60 * 24);
+
+                if (dayCount > 0) {
+                    const totalPrice = dayCount * roomPrice;
+                    $('#edit_total_price').val(totalPrice.toFixed(2));
+                } else {
+                    $('#edit_total_price').val('0.00');
+                }
+            }
+        }
+
+        // Validate the edit form before submission
+        $('#editReservationForm').on('submit', function(event) {
+            event.preventDefault();
+
+            const action = $(this).data('action');
+            const formData = $(this).serialize();
+
+            $.ajax({
+                url: action,
+                method: "PUT",
+                data: formData,
+                success: function(response) {
+                    $('#editReservationModal').modal('hide');
+                    window.location.reload(); // Reload the page to reflect changes
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        const errors = xhr.responseJSON.errors;
+                        $.each(errors, function(key, value) {
+                            $(`#edit_${key}`).addClass('is-invalid'); // Highlight the field with error
+                            $(`#${key}-error`).text(value[0]); // Display error message
+                        });
+                    } else {
+                        alert("An error occurred while updating the reservation. Please try again.");
+                    }
+                }
+            });
+        });
+
+        // Validation functions
+        function validateClient() {
+            if ($('#edit_client_id').val() === null) {
+                showError('#edit_client_id', 'Please select a client.');
+            } else {
+                clearError('#edit_client_id');
+            }
+        }
+
+        function validateRoom() {
+            if ($('#edit_room_id').val() === null) {
+                showError('#edit_room_id', 'Please select a room.');
+            } else {
+                clearError('#edit_room_id');
+            }
+        }
+
+        function showError(selector, message) {
+            const errorMessage = `<span class="text-danger error-message">${message}</span>`;
+            $(selector).closest('.form-group').append(errorMessage);
+        }
+
+        function clearError(selector) {
+            $(selector).closest('.form-group').find('.error-message').remove();
+        }
+
+        // Validate on change for edit form
+        $('#edit_client_id').on('change', validateClient);
+        $('#edit_room_id').on('change', validateRoom);
+        $('#edit_check_in, #edit_check_out').on('change', calculateTotalPrice);
+
+        // Populate the edit modal with reservation data
     });
 
-    function openEditModal(reservationId) {
-        // Implement fetch reservation details via AJAX and show edit modal
+    function openEditReservationModal(reservationId) {
+        $.ajax({
+            url: `/reservations/${reservationId}/edit`,
+            method: "GET",
+            success: function(reservation) {
+                // Add client option directly
+                let clientOption = `<option value="${reservation.client_id}" selected>
+                                        ${reservation.client_name} <span>(${reservation.client_cin})</span>
+                                    </option>`;
+                $('#edit_client_id').html(clientOption).trigger('change');
+
+                // Add room option directly
+                let roomOption = `<option value="${reservation.room_id}" selected>
+                                    ${reservation.room_nbr} (${reservation.room_type})
+                                </option>`;
+                $('#edit_room_id').html(roomOption).trigger('change');
+
+                // Set values for other fields
+                $('#edit_check_in').val(reservation.check_in);
+                $('#edit_check_out').val(reservation.check_out);
+                $('#edit_status').val(reservation.status);
+                $('#edit_payment_method').val(reservation.payment_method);
+                $('#edit_payment_status').val(reservation.payment_status);
+                $('#edit_total_price').val(reservation.total_price);
+
+                // Set the form action URL for updating the reservation
+                $('#editReservationForm').data('action', `/reservations/${reservationId}`);
+
+                // Show the edit modal
+                $('#editReservationModal').modal('show');
+            },
+            error: function() {
+                alert("Failed to fetch reservation details. Please try again.");
+            }
+        });
     }
 
-    function deleteReservation(reservationId) {
-        // Implement delete logic via AJAX and refresh the table
+    function deleteReservation(reservationId){
+        $('#deleteReservationModal').modal('show');
+
+        $('#confirmDelete').off('click').on('click', function () {
+            const csrfToken = $('#csrf-token').val(); // Get the CSRF token value
+
+            $.ajax({
+                url: `/reservations/${reservationId}`,
+                method: "DELETE",
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                success: function(response) {
+                    $('#deleteReservationModal').modal('hide');
+                    window.location.reload(); // Reload the page to reflect changes
+                },
+                error: function(xhr) {
+                    alert("Failed to delete the reservation. Please try again.");
+                }
+            });
+        });
     }
 
     $(document).ready(function() {
@@ -377,8 +711,7 @@
                         success: function(response) {
                             $('#addReservationForm').modal('hide');
                             $('#addReservationForm')[0].reset();
-                            showCustomToast("The reservation was added successfully!", 'Notification',
-                                4000);
+                            window.location.reload();
                         },
                         error: function(xhr) {
                             if (xhr.status === 422) {

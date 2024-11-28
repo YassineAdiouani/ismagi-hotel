@@ -28,8 +28,8 @@ class Reservation extends Model
         return $this->belongsTo(Room::class);
     }
 
-    public function payments()
+    public function payment()
     {
-        return $this->hasMany(Payment::class);
+        return $this->hasOne(Payment::class);
     }
 }

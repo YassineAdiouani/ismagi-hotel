@@ -55,12 +55,17 @@ Make sure you have the following installed on your system:
    php artisan key:generate
    ```
 
-5. **Run Migrations and Seed Database**
+5. **Create a Storage Symlink**
+   ```bash
+   php artisan storage:link
+   ```
+
+6. **Run Migrations and Seed Database**
    ```bash
    php artisan migrate --seed
    ```
 
-6. **Serve the Application**
+7. **Serve the Application**
    ```bash
    php artisan serve
    ```

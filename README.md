@@ -68,5 +68,11 @@ Make sure you have the following installed on your system:
 
 ---
 
+## Collaborators
+- **Yassine Adiouani**
+- **Youssef Bounit** ([GitHub Profile](https://github.com/youssef-bounit))
+
+---
+
 ## License
 This project is licensed under the ISMAGI License. See the `LICENSE` file for details.

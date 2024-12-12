@@ -119,7 +119,7 @@
 
         <div class="modal fade" id="editRoomModal">
             <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
+                <div class="modal-content modal-content-demo">
                     <div class="modal-header">
                         <h6 class="modal-title">Edit Room</h6>
                         <button aria-label="Close" class="close" data-dismiss="modal" type="button">
@@ -127,29 +127,74 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="editRoomForm" method="POST">
+                        <!-- Form for Editing an Existing Room with Parsley Validation -->
+                        <form id="editRoomForm" action="" data-method="POST" enctype="multipart/form-data" data-parsley-validate>
                             @csrf
                             @method('PUT')
         
-                            <!-- Room form fields (replace with room-specific fields) -->
-                            <div class="form-group">
-                                <label for="room_number">Room Number</label>
-                                <input type="text" id="room_number" name="nbr" class="form-control">
+                            <div class="row">
+                                <div class="form-group col-md-12">
+                                    <label for="edit-nbr">Room Number <span class="tx-danger">*</span></label>
+                                    <input type="text" id="edit-nbr" name="nbr" placeholder="Room number..." class="form-control" required
+                                           data-parsley-required-message="Room number is required">
+                                    <div class="error text-danger" id="edit-nbr-error"></div>
+                                </div>
+        
+                                <div class="form-group col-md-6">
+                                    <label for="edit-floor">Floor <span class="tx-danger">*</span></label>
+                                    <input type="number" id="edit-floor" name="floor" placeholder="Floor..." class="form-control" required
+                                           data-parsley-type="integer" data-parsley-required-message="Floor is required">
+                                    <div class="error text-danger" id="edit-floor-error"></div>
+                                </div>
+        
+                                <div class="form-group col-md-6">
+                                    <label for="edit-price">Price <span class="tx-danger">*</span></label>
+                                    <input type="text" id="edit-price" name="price" placeholder="Price..." class="form-control" 
+       required data-parsley-type="number" data-parsley-required-message="Price is required"
+       data-parsley-pattern="^\d+(\.\d{1,2})?$" data-parsley-pattern-message="Please enter a valid price (up to 2 decimal places)">
+                                    <div class="error text-danger" id="edit-price-error"></div>
+                                </div>
                             </div>
         
-                            <div class="form-group">
-                                <label for="floor">Floor</label>
-                                <input type="text" id="floor" name="floor" class="form-control">
-                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="edit-type">Room Type <span class="tx-danger">*</span></label>
+                                    <select id="edit-type" name="type" class="form-control" required data-parsley-required-message="Room type is required">
+                                        <option value="single">Single</option>
+                                        <option value="double">Double</option>
+                                        <option value="suite">Suite</option>
+                                    </select>
+                                    <div class="error text-danger" id="edit-type-error"></div>
+                                </div>
         
-                            <div class="form-group">
-                                <label for="price">Price</label>
-                                <input type="number" id="price" name="price" class="form-control">
+                                <div class="form-group col-md-6">
+                                    <label for="edit-status">Status <span class="tx-danger">*</span></label>
+                                    <select id="edit-status" name="status" class="form-control" required data-parsley-required-message="Status is required">
+                                        <option value="available">Available</option>
+                                        <option value="reserved">Reserved</option>
+                                        <option value="maintenance">Maintenance</option>
+                                        <option value="occupied">Occupied</option>
+                                    </select>
+                                    <div class="error text-danger" id="edit-status-error"></div>
+                                </div>
+        
+                                <div class="form-group col-md-12">
+                                    <label for="edit-description">Description</label>
+                                    <textarea id="edit-description" name="description" placeholder="Room description..." class="form-control"
+                                              data-parsley-type="string" data-parsley-required-message="Description is required if provided"></textarea>
+                                    <div class="error text-danger" id="edit-description-error"></div>
+                                </div>
+        
+                                <div class="form-group col-md-12">
+                                    <input class="custom-file-input" id="edit-customFile" type="file" name="images[]" accept="image/jpeg, image/png, image/jpg" multiple>
+                                    <label style="margin: 0px 14px;" class="custom-file-label" for="edit-customFile" id="edit-file-count-label">Choose files</label>
+                                    <div class="error text-danger" id="edit-images-error"></div>
+                                </div>
                             </div>
         
                             <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Save changes</button>
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn ripple btn-primary">Save changes</button>
+                                <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">Close</button>
                             </div>
                         </form>
                     </div>
@@ -235,7 +280,6 @@
                                         <i class="fe fe-align-right px-1" style="font-size: 13px;" data-toggle="tooltip" data-placement="bottom" title="Actions"></i>
                                     </span>
                                     <div  class="dropdown-menu tx-13">
-                                        <a class="dropdown-item" href="#">Details</a>
                                         <span class="dropdown-item" style="cursor: pointer;" onclick="openEditModal({{ $room->id }})">Update</span>
                                         <span style="cursor: pointer;" class="dropdown-item" onclick="deleteRoom({{ $room->id }})">Delete</span>
                                     </div>
@@ -296,16 +340,19 @@
                                     <i class="fa fa-angle-right fs-30" aria-hidden="true"></i>
                                 </a>
                             </div>                            
-                            <a href="#" class="adtocart" style="left: 43% !important;"> <i class="las la-notes-medical"></i>
-                            </a>
+                            {{-- <a href="#" class="adtocart" style="left: 43% !important;"> <i class="las la-notes-medical"></i>
+                            </a> --}}
+                            <div class="adtocart d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <strong>
+                                    ${{ $room->price}}
+                                </strong>
+                            </div>
                         </div>
                         <div class="pt-3">
                             <div class="d-flex justify-content-between align-items-center pt-3 pb-1 px-1">
                                 <span class="font-weight-bold tx-16 text-uppercase">{{ $room->nbr }}</span>
                                 <span>
-                                    <span class="px-1">
-                                        ${{ $room->price}}
-                                    </span>
+                                    
                                     <span style="font-size: 12px !important;" class="text-capitalize font-weight-bold badge badge-dark">
                                         {{ $room->type }}
                                     </span>
@@ -425,26 +472,33 @@
             }
         });
 
-        $('#editRoomForm').on('submit', function(event) {
+        $('#editRoomForm').off('submit').on('submit', function(event) {
             event.preventDefault();
-            
-            const action = $(this).data('action');
-            const formData = $(this).serialize();
+
+            const action = $(this).attr('action'); // Use 'action' instead of 'data-action'
+            const formData = new FormData(this); // Use FormData for handling files
+
+            // Clear previous error messages
+            $('.error.text-danger').text('');
 
             $.ajax({
                 url: action,
-                method: "PUT",
+                method: "POST", // Use POST with method override for PUT
                 data: formData,
+                processData: false, // Prevent jQuery from automatically processing the data
+                contentType: false, // Ensure correct content type for file upload
                 success: function(response) {
                     $('#editRoomModal').modal('hide');
-                    window.location.reload();
+                    window.location.reload(); // Reload to reflect changes
                 },
                 error: function(xhr) {
                     if (xhr.status === 422) {
                         const errors = xhr.responseJSON.errors;
                         $.each(errors, function(key, value) {
-                            $(`#${key}-error`).text(value[0]);
+                            $(`#edit-${key}-error`).text(value[0]); // Match error field IDs
                         });
+                    } else {
+                        alert('An error occurred. Please try again.');
                     }
                 }
             });
@@ -456,18 +510,31 @@
             url: `/rooms/${roomId}/edit`,
             method: "GET",
             success: function(room) {
-                $('#editRoomForm #room_number').val(room.nbr);
-                $('#editRoomForm #floor').val(room.floor);
-                $('#editRoomForm #price').val(room.price);
+                // Populate the form fields with room data
+                $('#editRoomForm #edit-nbr').val(room.nbr);
+                $('#editRoomForm #edit-floor').val(room.floor);
+                $('#editRoomForm #edit-price').val(room.price);
                 
+                // Set select values
+                $('#editRoomForm #edit-type').val(room.type);
+                $('#editRoomForm #edit-status').val(room.status);
+
+                $('#editRoomForm #edit-description').val(room.description);
+
                 // Set the form action URL for updating the room
-                $('#editRoomForm').attr('data-action', `/rooms/${roomId}`);
+                $('#editRoomForm').attr('action', `/rooms/${roomId}`);
                 
                 // Show the edit modal
                 $('#editRoomModal').modal('show');
+            },
+            error: function(xhr) {
+                // Handle errors (e.g., room not found)
+                console.error('Failed to fetch room data:', xhr.responseText);
+                alert('Error fetching room data. Please try again.');
             }
         });
     }
+
 
     function deleteRoom(roomId) {
         $('#deleteRoomModal').modal('show');

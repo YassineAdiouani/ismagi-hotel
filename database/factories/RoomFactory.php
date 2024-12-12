@@ -28,9 +28,9 @@ class RoomFactory extends Factory
             'status' => $this->faker->randomElement(['available', 'reserved', 'maintenance', 'occupied']),
             'description' => $this->faker->paragraph(),
             'images' => json_encode([
-                'https://picsum.photos/500/300?random=' . $this->faker->unique()->numberBetween(1, 1000),
-                'https://picsum.photos/500/300?random=' . $this->faker->unique()->numberBetween(1, 1000),
-                'https://picsum.photos/500/300?random=' . $this->faker->unique()->numberBetween(1, 1000),
+                'https://picsum.photos/500/300?rooms=' . $this->faker->unique()->numberBetween(1, 1000),
+                'https://picsum.photos/500/300?rooms=' . $this->faker->unique()->numberBetween(1, 1000),
+                'https://picsum.photos/500/300?rooms=' . $this->faker->unique()->numberBetween(1, 1000),
             ]),
         ];
     }

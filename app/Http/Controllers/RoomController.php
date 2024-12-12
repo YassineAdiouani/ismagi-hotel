@@ -11,8 +11,11 @@ class RoomController extends Controller
     public function autocomplete(Request $request)
     {
         $term = $request->get('term');
-        $rooms = Room::where('nbr', 'LIKE', "%{$term}%")
-            ->orWhere('type', 'LIKE', "%{$term}%")
+        $rooms = Room::where('status', 'available')
+            ->where(function ($query) use ($term) {
+                $query->where('nbr', 'LIKE', "%{$term}%")
+                    ->orWhere('type', 'LIKE', "%{$term}%");
+            })
             ->get();
 
         $results = $rooms->map(function ($room) {
@@ -21,6 +24,7 @@ class RoomController extends Controller
                 'text' => $room->nbr . ' - ' . $room->type,
                 'nbr' => $room->nbr,
                 'type' => $room->type,
+                'price' => $room->price
             ];
         });
 
@@ -30,7 +34,8 @@ class RoomController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request){
+    public function index(Request $request)
+    {
 
         $search = $request->input('search');
         $type = $request->input('type');
@@ -39,9 +44,9 @@ class RoomController extends Controller
         $query = Room::query();
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nbr', 'like', '%' . $search . '%')
-                ->orWhere('description', 'like', '%' . $search . '%');
+                    ->orWhere('description', 'like', '%' . $search . '%');
             });
         }
 
@@ -74,7 +79,8 @@ class RoomController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
         $validatedData = $request->validate([
             'nbr' => 'required|string|max:255',
@@ -124,7 +130,31 @@ class RoomController extends Controller
      */
     public function update(Request $request, Room $room)
     {
-        $room->update($request->all());
+        // Validate the request data
+        $validatedData = $request->validate([
+            'nbr' => 'required|string|max:255',
+            'floor' => 'required|integer|min:1',
+            'price' => 'required|numeric|min:0',
+            'type' => 'required|in:single,double,suite',
+            'status' => 'required|in:available,reserved,maintenance,occupied',
+            'description' => 'nullable|string',
+            'images.*' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $room->update($validatedData);
+
+        if ($request->hasFile('images')) {
+            $imagePaths = [];
+
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('rooms', 'public');
+            }
+
+            $existingImages = $room->images ? json_decode($room->images, true) : [];
+            $room->images = json_encode(array_merge($existingImages, $imagePaths));
+            $room->save();
+        }
+
         return response()->json(['message' => 'Room updated successfully']);
     }
 

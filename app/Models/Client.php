@@ -10,4 +10,9 @@ class Client extends Model
     use HasFactory;
 
     protected $fillable = ['cin', 'first_name', 'last_name', 'email', 'phone'];
+
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
 }
